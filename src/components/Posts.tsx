@@ -9,7 +9,7 @@ import { IoIosStats } from "react-icons/io";
 import { getPosts } from "@/app/actions/getPosts";
 
 export default async function Posts() {
-  let posts = [];
+  let posts: any[] = [];
   try {
     posts = await getPosts();
   } catch (error) {
