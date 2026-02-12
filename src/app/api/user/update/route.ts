@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { username, firstName, lastName, email } = await request.json();
+    const { username, firstName, lastName, email, profileImage } =
+      await request.json();
 
     if (!username) {
       return NextResponse.json(
@@ -12,13 +13,19 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    const updateData: any = {
+      firstName: firstName || null,
+      lastName: lastName || null,
+      email: email || null,
+    };
+
+    if (profileImage) {
+      updateData.profileImage = profileImage;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { username },
-      data: {
-        firstName: firstName || null,
-        lastName: lastName || null,
-        email: email || null,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ success: true, user: updatedUser });

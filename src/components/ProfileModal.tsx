@@ -123,7 +123,14 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     if (croppedBlob) {
       const croppedUrl = URL.createObjectURL(croppedBlob);
       setPreviewUrl(croppedUrl);
-      localStorage.setItem("profileImage", croppedUrl);
+      // Convert blob to base64 for persistent storage
+      const reader = new FileReader();
+      reader.readAsDataURL(croppedBlob);
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          localStorage.setItem("profileImageBase64", reader.result);
+        }
+      };
     }
     setShowCropper(false);
   };
@@ -139,6 +146,9 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     if (!user) return;
     setSaving(true);
     try {
+      // Get base64 image if it was just cropped
+      const profileImageBase64 = localStorage.getItem("profileImageBase64");
+
       const response = await fetch("/api/user/update", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -147,11 +157,19 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
+          ...(profileImageBase64 && { profileImage: profileImageBase64 }),
         }),
       });
       const data = await response.json();
       if (data.success) {
         setUser(data.user);
+        // Save to localStorage for immediate use in other components
+        if (data.user.profileImage) {
+          localStorage.setItem("userProfileImage", data.user.profileImage);
+          // Dispatch custom event to notify all components
+          window.dispatchEvent(new Event("profileImageUpdated"));
+        }
+        localStorage.removeItem("profileImageBase64");
         onClose();
       }
     } catch (error) {

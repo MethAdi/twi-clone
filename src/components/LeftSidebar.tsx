@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaFeather, FaXTwitter } from "react-icons/fa6";
 import Link from "next/link";
 import { GoHomeFill, GoSearch, GoBell, GoMail, GoPerson } from "react-icons/go";
@@ -8,11 +8,33 @@ import { MdVerified } from "react-icons/md";
 import { TbDotsCircleHorizontal } from "react-icons/tb";
 import Image from "next/image";
 import { HiDotsCircleHorizontal } from "react-icons/hi";
-import { useState } from "react";
 import ProfileModal from "./ProfileModal";
 
 export default function LeftSidebar() {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileImage, setProfileImage] = useState<string>(
+    "/images/profile.jpg",
+  );
+
+  useEffect(() => {
+    const stored = localStorage.getItem("userProfileImage");
+    if (stored) {
+      setProfileImage(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const stored = localStorage.getItem("userProfileImage");
+      if (stored) {
+        setProfileImage(stored);
+      }
+    };
+
+    window.addEventListener("profileImageUpdated", handleProfileUpdate);
+    return () =>
+      window.removeEventListener("profileImageUpdated", handleProfileUpdate);
+  }, []);
   return (
     <aside className="w-[50px] lg:w-[275px] p-1 lg:p-4 h-screen sticky top-0">
       {/* Logo */}
@@ -109,7 +131,7 @@ export default function LeftSidebar() {
       >
         <div className="flex items-center gap-2">
           <Image
-            src="/images/profile.jpg"
+            src={profileImage}
             alt="Profile"
             width={500}
             height={500}

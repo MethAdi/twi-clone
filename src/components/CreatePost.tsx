@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { TbPhoto } from "react-icons/tb";
 import { FaRegFaceSmile } from "react-icons/fa6";
@@ -10,11 +10,34 @@ import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { createPost } from "@/app/actions/createPost";
 
 export default function CreatePost() {
+  const [profileImage, setProfileImage] = useState<string>(
+    "/images/profile.jpg",
+  );
   const [post, setPost] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileref = useRef<HTMLInputElement | null>(null);
   const isDisabled = post.trim() === "" && !imagePreview;
   const [showPicker, setShowPicker] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("userProfileImage");
+    if (stored) {
+      setProfileImage(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const stored = localStorage.getItem("userProfileImage");
+      if (stored) {
+        setProfileImage(stored);
+      }
+    };
+
+    window.addEventListener("profileImageUpdated", handleProfileUpdate);
+    return () =>
+      window.removeEventListener("profileImageUpdated", handleProfileUpdate);
+  }, []);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -57,7 +80,7 @@ export default function CreatePost() {
       className="flex gap-4 p-4 border-b border-border"
     >
       <Image
-        src="/images/profile.jpg"
+        src={profileImage}
         alt="profile pic"
         width={500}
         height={500}
