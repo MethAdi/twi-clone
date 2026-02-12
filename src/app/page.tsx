@@ -3,16 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginUser } from "./actions/auth";
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
   const handleContinue = async () => {
-    if (!email.trim()) {
-      setError("Please enter an email or username");
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter username and password");
       return;
     }
 
@@ -20,10 +22,13 @@ export default function Home() {
     setError("");
 
     try {
-      // Set cookie for server-side auth and localStorage for client-side persistence
-      document.cookie = `userEmail=${encodeURIComponent(email)}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
-      localStorage.setItem("userEmail", email);
-      router.push("/home");
+      const response = await loginUser(email, password);
+      if (response.success) {
+        localStorage.setItem("userUsername", email);
+        router.push("/home");
+      } else {
+        setError(response.message || "Login failed");
+      }
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {
@@ -31,18 +36,12 @@ export default function Home() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError(
-      "Google Sign-in requires Supabase setup. Use the email field for now.",
-    );
-  };
-
   return (
     <div className="h-screen flex items-center justify-center">
       <div className="bg-background max-w-[300px] w-[95%] py-12 rounded-lg px-6">
         <h2 className="font-bold text-3xl text-primary-text">Sign in to X</h2>
         <button
-          onClick={handleGoogleSignIn}
+          onClick={() => {}}
           className="bg-white w-full mt-8 h-10 flex justify-center items-center gap-2 cursor-pointer rounded-full hover:bg-gray-200"
         >
           <Image
@@ -59,10 +58,18 @@ export default function Home() {
           <div className="flex-grow h-px bg-border"></div>
         </div>
         <input
-          type="email"
-          placeholder="Phone, Email address or Username"
+          type="text"
+          placeholder="username"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleContinue()}
+          className="w-full bg-background outline-none rounded-md p-4 placeholder-secondary-text border border-border text-white"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && handleContinue()}
           className="w-full bg-background outline-none rounded-md p-4 placeholder-secondary-text border border-border text-white"
         />
@@ -75,11 +82,11 @@ export default function Home() {
           {loading ? "Loading..." : "Continue"}
         </button>
         <button className="text-white w-full mt-8 rounded-full h-10 flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-200 font-semibold border border-border hover:text-black">
-          Forgot Password?
+          Forgot password?
         </button>
         <div className="text-secondary-text mt-8">
-          <span className="mr-1">Already have an account?</span>
-          <Link href="#" className="text-primary">
+          <span className="mr-1">Don't have an account?</span>
+          <Link href="/signup" className="text-primary">
             Sign up
           </Link>
         </div>

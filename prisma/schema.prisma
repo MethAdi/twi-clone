@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url= env("DATABASE_URL")
 }
 
 model Post {
@@ -14,4 +14,20 @@ model Post {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("posts")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String?
+  password String
+  firstName String?
+  lastName  String?
+  profileImage String? @map("profile_image")
+
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
 }
