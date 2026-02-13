@@ -33,6 +33,7 @@ export default function SignUp() {
       );
       if (result.success) {
         localStorage.setItem("userUsername", username);
+        localStorage.setItem("userId", result.userId.toString());
         router.push("/home");
       } else {
         setError(result.message || "Sign up failed");

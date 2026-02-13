@@ -74,7 +74,7 @@ export default function LeftSidebar() {
 
         {/* Messages */}
         <Link
-          href="#"
+          href="/messages"
           className="text-white flex items-center lg:gap-3 p-3 rounded-full hover:bg-hover"
         >
           <GoMail size={30} />

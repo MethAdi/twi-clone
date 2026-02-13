@@ -25,6 +25,7 @@ export default function Home() {
       const response = await loginUser(email, password);
       if (response.success) {
         localStorage.setItem("userUsername", email);
+        localStorage.setItem("userId", response.userId.toString());
         router.push("/home");
       } else {
         setError(response.message || "Login failed");
