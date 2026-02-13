@@ -31,7 +31,7 @@ export default function SignUp() {
         lastName,
         password,
       );
-      if (result.success) {
+      if (result.success && result.userId) {
         localStorage.setItem("userUsername", username);
         localStorage.setItem("userId", result.userId.toString());
         router.push("/home");

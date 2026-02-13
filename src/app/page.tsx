@@ -23,7 +23,7 @@ export default function Home() {
 
     try {
       const response = await loginUser(email, password);
-      if (response.success) {
+      if (response.success && response.userId) {
         localStorage.setItem("userUsername", email);
         localStorage.setItem("userId", response.userId.toString());
         router.push("/home");
