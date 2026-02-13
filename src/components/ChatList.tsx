@@ -20,6 +20,7 @@ interface Conversation {
     content: string;
     imageUrl: string | null;
     createdAt: Date;
+    isRead: boolean;
   }>;
   otherUser: {
     id: number;
@@ -206,8 +207,15 @@ export default function ChatList({
                   />
                   <div className="flex-1 text-left min-w-0">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white truncate">
-                        {conv.otherUser.firstName} {conv.otherUser.lastName}
+                      <div className="flex items-center gap-2">
+                        <div className="font-semibold text-white truncate">
+                          {conv.otherUser.firstName} {conv.otherUser.lastName}
+                        </div>
+                        {conv.messages.some(
+                          (msg) => !msg.isRead && msg.senderId !== userId
+                        ) && (
+                          <div className="w-2 h-2 bg-primary rounded-full shrink-0"></div>
+                        )}
                       </div>
                       <div className="text-secondary-text text-xs ml-2 shrink-0">
                         {conv.messages[0] &&

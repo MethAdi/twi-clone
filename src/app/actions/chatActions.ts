@@ -205,4 +205,23 @@ export async function searchUsers(query: string, excludeUserId: number) {
     console.error("Error searching users:", error);
     return [];
   }
+}
+
+export async function markMessagesAsRead(conversationId: number, userId: number) {
+  try {
+    await prisma.message.updateMany({
+      where: {
+        conversationId,
+        senderId: {
+          not: userId,
+        },
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
+  }
 } 

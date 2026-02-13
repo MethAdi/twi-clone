@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { getMessages, sendMessage } from "@/app/actions/chatActions";
+import { getMessages, sendMessage, markMessagesAsRead } from "@/app/actions/chatActions";
 import { IoArrowBack } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { BsEmojiSmile } from "react-icons/bs";
@@ -60,6 +60,7 @@ export default function ChatWindow({
 
   useEffect(() => {
     loadMessages();
+    markMessagesAsRead(conversationId, userId);
     const interval = setInterval(loadMessages, 1500);
     return () => clearInterval(interval);
   }, [conversationId]);
